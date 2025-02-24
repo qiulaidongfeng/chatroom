@@ -64,9 +64,14 @@ class Channel:
 
     # 退出聊天室
     def ExitRoom(self, name: str):
-        self.__lock.acquire()
-        pubsub = self.__allRoom[name]
-        self.__lock.release()
+        pubsub = None
+        with self.__lock:
+            pubsub = self.__allRoom.get(name)
+            if pubsub == None:
+                return
+            del self.__allRoom[name]
+            if name in self.__roomMsg:
+                del self.__roomMsg[name]
         pubsub.unsubscribe(name)
 
     def waitMessage(self):
