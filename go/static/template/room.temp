@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天室：{{.roomname}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        h1 {
+            background-color: #5f9ea0;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        div {
+            background: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        p {
+            margin: 0 0 10px;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+        form {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #5f9ea0;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3c7a7d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>聊天室：{{.roomname}}</h1>
+        <p id="time">5秒后刷新</p>
+        {{range $i, $v := getAllMsg}}
+        <div>
+            <p>{{$v}}</p>
+            <hr>
+        </div>
+        {{end}}
+        <form action="/sendMessage" method="post">
+            <input type="text" name="message" placeholder="在这里输入您的消息..." required>
+            <button type="submit">发送</button>
+        </form>
+    </div>
+</body>
+<script>
+    function f(){
+        let i = 5;
+        setInterval(function(){
+            i--;
+            document.getElementById("time").innerText=i.toString()+"秒后刷新";
+            if (i==0){
+                location.reload();
+            }
+        },1000);
+    }
+    f();
+</script>
+</html>
