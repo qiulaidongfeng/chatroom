@@ -6,7 +6,7 @@ def test_Channel():
     c.CreateRoom("test")
     c.SendMessage("test", "k")
     c.waitMessage()
-    msg = c.EnterRoom("test")
+    msg = c.GetHistory("test")
     c.ExitRoom("test")
     assert msg != None
     assert msg[0] == "k"

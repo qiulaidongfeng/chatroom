@@ -20,7 +20,7 @@ def main():
     print(time.time() - start)
 
     start = time.time()
-    msg = c.EnterRoom("test")
+    msg = c.GetHistory("test")
     print(time.time() - start)
 
     start = time.time()

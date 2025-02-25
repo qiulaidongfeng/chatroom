@@ -52,7 +52,7 @@ class Channel:
                 return
 
     # 获取聊天室的历史消息
-    def EnterRoom(self, name: str):
+    def GetHistory(self, name: str):
         self.__lock.acquire()
         ret = self.__roomMsg.get(name)
         self.__lock.release()
