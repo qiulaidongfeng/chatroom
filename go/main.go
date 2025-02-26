@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 	"unsafe"
 
 	"github.com/gin-gonic/gin"
@@ -84,7 +85,7 @@ func enterRoom(ctx *gin.Context, name string) bool {
 	if !exist {
 		return false
 	}
-	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.Format("2006-01-02 15:04:05")})
+	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.Sub(time.Now()).String()})
 	if err != nil {
 		panic(err)
 	}

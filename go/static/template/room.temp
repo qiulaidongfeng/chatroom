@@ -66,7 +66,7 @@
     <div class="container">
         <h1>聊天室：{{.roomname}}</h1>
         <p id="time">5秒后刷新</p>
-        <p>聊天室自动删除时间：{{.removetime}}</p>
+        <p>距离聊天室自动删除还有：{{.removetime}}</p>
         {{range $i, $v := .history}}
         <div>
             <p>{{$v}}</p>
