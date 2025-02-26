@@ -34,8 +34,10 @@ func main() {
 			ctx.String(400, "聊天室名不能为空")
 			return
 		}
-		//TODO:在聊天室已创建时报错
-		channel.CreateRoom(name)
+		if !channel.CreateRoom(name) {
+			ctx.String(400, "聊天室 %s 已创建", name)
+			return
+		}
 		redirect(ctx, name)
 	})
 	s.GET("/enterroom", func(ctx *gin.Context) {

@@ -38,9 +38,9 @@ func init() {
 }
 
 // CreateRoom 创建一个聊天室
-func CreateRoom(name string) {
+func CreateRoom(name string) bool {
 	if _, ok := c.all.Load(name); ok {
-		return
+		return false
 	}
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -73,6 +73,7 @@ func CreateRoom(name string) {
 		}
 	}()
 	c.all.Store(name, r)
+	return true
 }
 
 var test bool
