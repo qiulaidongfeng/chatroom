@@ -66,14 +66,14 @@
     <div class="container">
         <h1>聊天室：{{.roomname}}</h1>
         <p id="time">5秒后刷新</p>
-        {{range $i, $v := getAllMsg}}
+        {{range $i, $v := getAllMsg .roomname}}
         <div>
             <p>{{$v}}</p>
             <hr>
         </div>
         {{end}}
-        <form action="/sendMessage" method="post">
-            <input type="text" name="message" placeholder="在这里输入您的消息..." required>
+        <form action="/sendMessage?roomname={{.roomname}}" method="post">
+            <input id="msg" type="text" name="message" placeholder="在这里输入您的消息..." required>
             <button type="submit">发送</button>
         </form>
     </div>
@@ -82,6 +82,9 @@
     function f(){
         let i = 5;
         setInterval(function(){
+            if (document.getElementById("msg").value != ""){
+                return;
+            }
             i--;
             document.getElementById("time").innerText=i.toString()+"秒后刷新";
             if (i==0){

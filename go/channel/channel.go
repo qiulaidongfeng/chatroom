@@ -76,12 +76,22 @@ func GetHistory(roomname string) []string {
 }
 
 // SendMessage 发送一条消息到聊天室
-func SendMessage(roomname string, message string) {
+func SendMessage(roomname string, message string) bool {
 	_, ok := c.all.Load(roomname)
 	if !ok {
-		return
+		return false
 	}
-	c.rdb.Publish(context.Background(), roomname, message)
+	for i := range 10 {
+		err := c.rdb.Publish(context.Background(), roomname, message).Err()
+		if err != nil {
+			continue
+		}
+		if i == 9 {
+			panic(err)
+		}
+		break
+	}
+	return true
 }
 
 // waitMessage 等待任意聊天室收到一条消息
