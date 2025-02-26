@@ -82,11 +82,10 @@ func main() {
 			</script>
 		</html>
 		`
-		ret = fmt.Sprintf(ret, strings.Join([]string{"http://", ctx.Request.Host, "/enterroom?roomname=", name}, ""))
+		ret = fmt.Sprintf(ret, strings.Join([]string{"https://", ctx.Request.Host, "/enterroom?roomname=", name}, ""))
 		ctx.Data(200, "text/html", unsafe.Slice(unsafe.StringData(ret), len(ret)))
 	})
-	//TODO:使用https
-	s.Run(":801")
+	s.RunTLS(":4431", "./cert.pem", "./key.pem")
 }
 
 func enterRoom(ctx *gin.Context, name string) {
