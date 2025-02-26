@@ -90,7 +90,8 @@ func main() {
 
 func enterRoom(ctx *gin.Context, name string) {
 	var buf bytes.Buffer
-	err := roomtmpl.Execute(&buf, map[string]string{"roomname": name})
+	h, r := channel.GetInfo(name)
+	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.Format("2006-01-02 15:04:05")})
 	if err != nil {
 		panic(err)
 	}
@@ -99,9 +100,6 @@ func enterRoom(ctx *gin.Context, name string) {
 
 var roomtmpl = func() *template.Template {
 	t := template.New("room")
-	t.Funcs(template.FuncMap{"getAllMsg": func(roomname string) []string {
-		return channel.GetHistory(roomname)
-	}})
 	file, err := os.ReadFile(filepath.Join(tmpl, "room.temp"))
 	if err != nil {
 		panic(err)

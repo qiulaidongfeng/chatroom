@@ -3,6 +3,7 @@ package channel
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -17,9 +18,12 @@ type Channel struct {
 // room 聊天室
 // TODO:支持多个用户进入并退出聊天室
 type room struct {
-	pubsub  *redis.PubSub
-	history []string
-	lock    sync.Mutex
+	pubsub     *redis.PubSub
+	history    []string
+	removeTime time.Time
+	t          *time.Timer
+	//Note:这里故意不用读写锁，因为一个聊天室的并发量不会很大
+	lock sync.Mutex
 }
 
 var seam = make(chan struct{})
@@ -42,19 +46,29 @@ func CreateRoom(name string) {
 	defer c.lock.Unlock()
 	r := &room{}
 	r.pubsub = c.rdb.Subscribe(context.Background(), name)
+	r.removeTime = time.Now().Add(2 * time.Hour)
+	r.t = time.NewTimer(r.removeTime.Sub(time.Now()))
 	_, err := r.pubsub.Receive(context.Background())
 	if err != nil {
 		panic(err)
 	}
 	go func() {
-		c := r.pubsub.Channel()
+		ch := r.pubsub.Channel()
 		for {
-			m := <-c
+			var m *redis.Message
+			select {
+			case m = <-ch:
+			case <-r.t.C:
+				ExitRoom(name)
+				return
+			}
 			if test {
 				seam <- struct{}{}
 			}
 			r.lock.Lock()
 			r.history = append(r.history, m.Payload)
+			r.removeTime = time.Now().Add(2 * time.Hour)
+			r.t.Reset(r.removeTime.Sub(time.Now()))
 			r.lock.Unlock()
 		}
 	}()
@@ -63,16 +77,16 @@ func CreateRoom(name string) {
 
 var test bool
 
-// GetHistory 获取聊天室的历史消息
-func GetHistory(roomname string) []string {
+// GetInfo 获取聊天室的信息
+func GetInfo(roomname string) (history []string, removeTime time.Time) {
 	v, ok := c.all.Load(roomname)
 	if !ok {
-		return nil
+		return nil, time.Time{}
 	}
 	r := v.(*room)
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	return r.history
+	return r.history, r.removeTime
 }
 
 // SendMessage 发送一条消息到聊天室
@@ -102,7 +116,7 @@ func waitMessage() {
 
 // ExitRoom 退出聊天室
 func ExitRoom(roomname string) {
-	v, ok := c.all.Load(roomname)
+	v, ok := c.all.LoadAndDelete(roomname)
 	if !ok {
 		return
 	}
