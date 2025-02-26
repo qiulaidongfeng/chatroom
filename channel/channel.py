@@ -4,7 +4,7 @@ import threading
 
 # Channel 管理多个聊天室
 class Channel:
-    __pool = redis.ConnectionPool(host="localhost", port=6379, decode_responses=True)
+    __pool = redis.ConnectionPool(host="127.0.0.1", port=6379, decode_responses=True)
     __r = redis.Redis(connection_pool=__pool)
     # 保存所有聊天室的从redis得到的pubsub
     __allRoom = {}
