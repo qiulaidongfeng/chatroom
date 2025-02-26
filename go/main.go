@@ -42,7 +42,10 @@ func main() {
 	})
 	s.GET("/enterroom", func(ctx *gin.Context) {
 		if name := ctx.Query("roomname"); name != "" {
-			enterRoom(ctx, name)
+			if !enterRoom(ctx, name) {
+				ctx.String(400, "聊天室 %s 不存在", name)
+				return
+			}
 			return
 		}
 		ctx.File(enterroom)
@@ -53,8 +56,10 @@ func main() {
 			ctx.String(400, "聊天室名不能为空")
 			return
 		}
-		//TODO:在聊天室不存在时报错
-		enterRoom(ctx, name)
+		if !enterRoom(ctx, name) {
+			ctx.String(400, "聊天室 %s 不存在", name)
+			return
+		}
 	})
 	s.POST("/sendMessage", func(ctx *gin.Context) {
 		name := ctx.Query("roomname")
@@ -73,14 +78,18 @@ func main() {
 	s.RunTLS(":4431", "./cert.pem", "./key.pem")
 }
 
-func enterRoom(ctx *gin.Context, name string) {
+func enterRoom(ctx *gin.Context, name string) bool {
 	var buf bytes.Buffer
-	h, r := channel.GetInfo(name)
+	h, r, exist := channel.GetInfo(name)
+	if !exist {
+		return false
+	}
 	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.Format("2006-01-02 15:04:05")})
 	if err != nil {
 		panic(err)
 	}
 	ctx.Data(200, "text/html", buf.Bytes())
+	return true
 }
 
 var roomtmpl = func() *template.Template {

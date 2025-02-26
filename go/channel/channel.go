@@ -79,15 +79,15 @@ func CreateRoom(name string) bool {
 var test bool
 
 // GetInfo 获取聊天室的信息
-func GetInfo(roomname string) (history []string, removeTime time.Time) {
+func GetInfo(roomname string) (history []string, removeTime time.Time, exist bool) {
 	v, ok := c.all.Load(roomname)
 	if !ok {
-		return nil, time.Time{}
+		return nil, time.Time{}, false
 	}
 	r := v.(*room)
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	return r.history, r.removeTime
+	return r.history, r.removeTime, true
 }
 
 // SendMessage 发送一条消息到聊天室
