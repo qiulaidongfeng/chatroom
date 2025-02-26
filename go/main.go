@@ -36,7 +36,7 @@ func main() {
 		}
 		//TODO:在聊天室已创建时报错
 		channel.CreateRoom(name)
-		enterRoom(ctx, name)
+		redirect(ctx, name)
 	})
 	s.GET("/enterroom", func(ctx *gin.Context) {
 		if name := ctx.Query("roomname"); name != "" {
@@ -66,24 +66,7 @@ func main() {
 			ctx.String(400, "不能发送消息到不存在的聊天室")
 			return
 		}
-
-		ret := `
-		<!DOCTYPE html>
-			<head>
-				<meta charset="UTF-8">
-			</head>
-			<body>
-			</body>
-			<script>
-				function f() {
-					window.location.href = "%s";
-				}
-				f();
-			</script>
-		</html>
-		`
-		ret = fmt.Sprintf(ret, strings.Join([]string{"https://", ctx.Request.Host, "/enterroom?roomname=", name}, ""))
-		ctx.Data(200, "text/html", unsafe.Slice(unsafe.StringData(ret), len(ret)))
+		redirect(ctx, name)
 	})
 	s.RunTLS(":4431", "./cert.pem", "./key.pem")
 }
@@ -110,3 +93,23 @@ var roomtmpl = func() *template.Template {
 	}
 	return t
 }()
+
+func redirect(ctx *gin.Context, name string) {
+	ret := `
+		<!DOCTYPE html>
+			<head>
+				<meta charset="UTF-8">
+			</head>
+			<body>
+			</body>
+			<script>
+				function f() {
+					window.location.href = "%s";
+				}
+				f();
+			</script>
+		</html>
+		`
+	ret = fmt.Sprintf(ret, strings.Join([]string{"https://", ctx.Request.Host, "/enterroom?roomname=", name}, ""))
+	ctx.Data(200, "text/html", unsafe.Slice(unsafe.StringData(ret), len(ret)))
+}
