@@ -12,7 +12,7 @@ func TestAll(t *testing.T) {
 	SendMessage("test", "k")
 	waitMessage()
 	ExitRoom("test")
-	got := GetHistory("test")
+	got, _, _ := GetInfo("test")
 	want := []string{"k", "k"}
 	if !slices.Equal(got, want) {
 		t.Fatalf("got %v, want %v", got, want)

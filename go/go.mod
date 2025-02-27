@@ -1,4 +1,4 @@
-module chatroom
+module gitee.com/qiulaidongfeng/chatroom/go/chatroom
 
 go 1.24
 
