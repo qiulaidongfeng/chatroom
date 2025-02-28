@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Hahdle(s *gin.Engine) {
+func Handle(s *gin.Engine) {
 	s.GET("/", func(ctx *gin.Context) {
 		ctx.File(index)
 	})

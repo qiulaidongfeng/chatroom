@@ -1,5 +1,5 @@
 package chatroom
 
 func init() {
-	Hahdle(S)
+	Handle(S)
 }
