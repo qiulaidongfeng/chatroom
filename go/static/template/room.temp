@@ -74,7 +74,7 @@
 <body>
     <div class="container">
         <h1>聊天室：{{.roomname}}</h1>
-        <p id="time">5秒后刷新</p>
+        <p id="time">10秒后刷新</p>
         <div class="info-row">
             <p>距离聊天室自动删除还有：{{.removetime}}</p>
             <button onclick="window.location.href='/'">返回首页</button>
@@ -93,7 +93,7 @@
 </body>
 <script>
     function f(){
-        let i = 5;
+        let i = 10;
         setInterval(function(){
             if (document.getElementById("msg").value != ""){
                 return;
