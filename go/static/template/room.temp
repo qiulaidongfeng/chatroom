@@ -60,13 +60,25 @@
         button:hover {
             background-color: #3c7a7d;
         }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .info-row button {
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>聊天室：{{.roomname}}</h1>
         <p id="time">5秒后刷新</p>
-        <p>距离聊天室自动删除还有：{{.removetime}}</p>
+        <div class="info-row">
+            <p>距离聊天室自动删除还有：{{.removetime}}</p>
+            <button onclick="window.location.href='/'">返回首页</button>
+        </div>
         {{range $i, $v := .history}}
         <div>
             <p>{{$v}}</p>
