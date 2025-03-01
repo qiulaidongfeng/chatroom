@@ -74,12 +74,14 @@
 <body>
     <div class="container">
         <h1>聊天室：{{.roomname}}</h1>
-        <p id="time">10秒后刷新</p>
+        <p id="time"></p>
         <div class="info-row">
             <p>距离聊天室自动删除还有：{{.removetime}}</p>
             <button onclick="window.location.href='/'">返回首页</button>
             <button onclick="location.reload()">立即刷新</button>
         </div>
+        <input type="number" step="1" min="0" id="reloadStep">
+        <button onclick="changeStep()">修改刷新秒数</button>
         {{range $i, $v := .history}}
         <div>
             <p>{{$v}}</p>
@@ -92,11 +94,26 @@
         </form>
     </div>
 </body>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script>
+    let i = {{.step}};
+    function changeStep(){
+        v = document.getElementById("reloadStep").value;
+        i = parseInt(v,10);
+        setCookie("step",v,{{.expire}});
+        document.getElementById("reloadStep").value = "";
+    }
+    function setCookie(name, value, second) {
+        $.cookie(name,value,{expire:second});
+    }
+    function getCookie(name) {
+        var allCookies = $.cookie();
+        return allCookies[name]
+    }
     function f(){
-        let i = 10;
         setInterval(function(){
-            if (document.getElementById("msg").value != ""){
+            if (document.getElementById("msg").value != "" || document.getElementById("reloadStep").value != ""){
                 return;
             }
             i--;
@@ -105,6 +122,11 @@
                 location.reload();
             }
         },1000);
+    }
+    step = getCookie("step") ;
+    console.log(step);
+    if (step != undefined){
+        i = parseInt(step);
     }
     f();
 </script>
