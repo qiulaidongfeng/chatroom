@@ -8,6 +8,8 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+var _ Channel = (*pubsub_channel)(nil)
+
 // pubsub_channel 管理基于redis发布订阅实现的聊天室
 type pubsub_channel struct {
 	rdb  *redis.Client
@@ -35,7 +37,6 @@ func (c *pubsub_channel) Init() {
 	}
 }
 
-// CreateRoom 创建一个聊天室
 func (c *pubsub_channel) CreateRoom(name string) bool {
 	if _, ok := c.all.Load(name); ok {
 		return false
@@ -60,7 +61,7 @@ func (c *pubsub_channel) CreateRoom(name string) bool {
 				c.ExitRoom(name)
 				return
 			}
-			if test {
+			if Test {
 				seam <- struct{}{}
 			}
 			r.lock.Lock()
@@ -74,21 +75,17 @@ func (c *pubsub_channel) CreateRoom(name string) bool {
 	return true
 }
 
-var test bool
-
-// GetInfo 获取聊天室的信息
-func (c *pubsub_channel) GetInfo(roomname string) (history []string, removeTime time.Time, exist bool) {
+func (c *pubsub_channel) GetInfo(roomname string) (history []string, ttl time.Duration, exist bool) {
 	v, ok := c.all.Load(roomname)
 	if !ok {
-		return nil, time.Time{}, false
+		return nil, 0, false
 	}
 	r := v.(*pubsub_room)
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	return r.history, r.removeTime, true
+	return r.history, r.removeTime.Sub(time.Now()), true
 }
 
-// SendMessage 发送一条消息到聊天室
 func (c *pubsub_channel) SendMessage(roomname string, message string) bool {
 	_, ok := c.all.Load(roomname)
 	if !ok {
@@ -107,13 +104,10 @@ func (c *pubsub_channel) SendMessage(roomname string, message string) bool {
 	return true
 }
 
-// waitMessage 等待任意聊天室收到一条消息
-// 用于测试 仅在test==true时可用
-func waitMessage() {
+func (c *pubsub_channel) waitMessage() {
 	<-seam
 }
 
-// ExitRoom 退出聊天室
 func (c *pubsub_channel) ExitRoom(roomname string) {
 	v, ok := c.all.LoadAndDelete(roomname)
 	if !ok {

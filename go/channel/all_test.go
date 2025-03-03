@@ -8,9 +8,9 @@ import (
 func TestAll(t *testing.T) {
 	C.CreateRoom("test")
 	C.SendMessage("test", "k")
-	waitMessage()
+	C.waitMessage()
 	C.SendMessage("test", "k")
-	waitMessage()
+	C.waitMessage()
 	got, _, _ := C.GetInfo("test")
 	C.ExitRoom("test")
 	want := []string{"k", "k"}
@@ -20,5 +20,7 @@ func TestAll(t *testing.T) {
 }
 
 func init() {
-	test = true
+	if !Test {
+		panic("测试应该设置TEST环境变量为非空")
+	}
 }

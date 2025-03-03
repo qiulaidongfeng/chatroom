@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 	"unsafe"
 
 	"gitee.com/qiulaidongfeng/chatroom/go/chatroom/channel"
@@ -76,7 +75,7 @@ func enterRoom(ctx *gin.Context, name string) bool {
 	if !exist {
 		return false
 	}
-	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.Sub(time.Now()).String(), "step": 10, "expire": 2 * 60 * 60})
+	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.String(), "step": 10, "expire": 2 * 60 * 60})
 	if err != nil {
 		panic(err)
 	}
