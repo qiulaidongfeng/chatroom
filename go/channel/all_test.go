@@ -6,13 +6,13 @@ import (
 )
 
 func TestAll(t *testing.T) {
-	CreateRoom("test")
-	SendMessage("test", "k")
+	C.CreateRoom("test")
+	C.SendMessage("test", "k")
 	waitMessage()
-	SendMessage("test", "k")
+	C.SendMessage("test", "k")
 	waitMessage()
-	ExitRoom("test")
-	got, _, _ := GetInfo("test")
+	got, _, _ := C.GetInfo("test")
+	C.ExitRoom("test")
 	want := []string{"k", "k"}
 	if !slices.Equal(got, want) {
 		t.Fatalf("got %v, want %v", got, want)

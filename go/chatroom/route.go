@@ -27,7 +27,7 @@ func Handle(s *gin.Engine) {
 			ctx.String(400, "聊天室名不能为空")
 			return
 		}
-		if !channel.CreateRoom(name) {
+		if !channel.C.CreateRoom(name) {
 			ctx.String(400, "聊天室 %s 已创建", name)
 			return
 		}
@@ -62,7 +62,7 @@ func Handle(s *gin.Engine) {
 			return
 		}
 		//Note:发送消息到不存在的聊天室时报错
-		if !channel.SendMessage(name, msg) {
+		if !channel.C.SendMessage(name, msg) {
 			ctx.String(400, "不能发送消息到不存在的聊天室")
 			return
 		}
@@ -72,7 +72,7 @@ func Handle(s *gin.Engine) {
 
 func enterRoom(ctx *gin.Context, name string) bool {
 	var buf bytes.Buffer
-	h, r, exist := channel.GetInfo(name)
+	h, r, exist := channel.C.GetInfo(name)
 	if !exist {
 		return false
 	}
