@@ -96,11 +96,11 @@ func (c *pubsub_channel) SendMessage(roomname string, message string) bool {
 	}
 	for i := range 10 {
 		err := c.rdb.Publish(context.Background(), roomname, message).Err()
-		if err != nil {
-			continue
-		}
 		if i == 9 {
 			panic(err)
+		}
+		if err != nil {
+			continue
 		}
 		break
 	}
