@@ -13,6 +13,7 @@ import (
 var _ Channel = (*pubsub_channel)(nil)
 
 // pubsub_channel 管理基于redis发布订阅实现的聊天室
+// Deprecated: 已放弃
 type pubsub_channel struct {
 	rdb  *redis.Client
 	all  sync.Map //map[string]*room
