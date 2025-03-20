@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 	"unsafe"
 
 	"gitee.com/qiulaidongfeng/chatroom/go/chatroom/channel"
@@ -70,12 +73,30 @@ func Handle(s *gin.Engine) {
 }
 
 func enterRoom(ctx *gin.Context, name string) bool {
+	id, _ := ctx.Cookie(name + "_id")
+	step, _ := ctx.Cookie(name + "_step")
+	var id_expire = 10
+	if step != "" && step != "10" {
+		var err error
+		id_expire, err = strconv.Atoi(step)
+		if err != nil {
+			slog.Error("", "err", err)
+			id_expire = 10
+		}
+	}
+	id_expire *= 2 //TODO:设置更好的值
+	if id == "" {
+		id = channel.C.EnterRoom(name, time.Duration(id_expire)*time.Second)
+	} else {
+		channel.C.SetIdExpire(name, id, time.Duration(id_expire)*time.Second)
+	}
+	ctx.SetCookie(name+"_id", id, id_expire, "", "", true, true)
 	var buf bytes.Buffer
-	h, r, exist := channel.C.GetInfo(name)
+	h, r, exist, online := channel.C.GetInfo(name, id)
 	if !exist {
 		return false
 	}
-	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.String(), "step": 10, "expire": 2 * 60 * 60})
+	err := roomtmpl.Execute(&buf, map[string]any{"roomname": name, "history": h, "removetime": r.String(), "expire": 2 * 60 * 60, "online": online})
 	if err != nil {
 		panic(err)
 	}

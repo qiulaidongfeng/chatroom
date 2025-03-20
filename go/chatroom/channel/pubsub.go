@@ -78,15 +78,15 @@ func (c *pubsub_channel) CreateRoom(name string) bool {
 	return true
 }
 
-func (c *pubsub_channel) GetInfo(roomname string) (history []string, ttl time.Duration, exist bool) {
+func (c *pubsub_channel) GetInfo(roomname, _ string) (history []string, ttl time.Duration, exist bool, online int64) {
 	v, ok := c.all.Load(roomname)
 	if !ok {
-		return nil, 0, false
+		return nil, 0, false, 0
 	}
 	r := v.(*pubsub_room)
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	return r.history, r.removeTime.Sub(time.Now()), true
+	return r.history, r.removeTime.Sub(time.Now()), true, 0
 }
 
 func (c *pubsub_channel) SendMessage(roomname string, message string) bool {
@@ -120,3 +120,6 @@ func (c *pubsub_channel) ExitRoom(roomname string) {
 	r.pubsub.Close()
 	r.pubsub.Unsubscribe(context.Background(), roomname)
 }
+
+func (c *pubsub_channel) EnterRoom(roomname string, expire time.Duration) (id string) { return "" }
+func (c *pubsub_channel) SetIdExpire(roomname, id string, expire time.Duration)       {}

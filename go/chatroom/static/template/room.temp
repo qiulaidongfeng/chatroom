@@ -77,6 +77,7 @@
         <p id="time"></p>
         <div class="info-row">
             <p>距离聊天室自动删除还有：{{.removetime}}</p>
+            <p>在线id数：{{.online}}</p>
             <button onclick="window.location.href='/'">返回首页</button>
             <button onclick="location.reload()">立即刷新</button>
         </div>
@@ -97,11 +98,11 @@
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.7.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script>
-    let i = {{.step}};
+    let i = 10;
     function changeStep(){
         v = document.getElementById("reloadStep").value;
         i = parseInt(v,10);
-        setCookie("step",v,{{.expire}});
+        setCookie("{{.roomname}}_step",v,{{.expire}});
         document.getElementById("reloadStep").value = "";
     }
     function setCookie(name, value, second) {
@@ -123,7 +124,7 @@
             }
         },1000);
     }
-    step = getCookie("step") ;
+    step = getCookie("{{.roomname}}_step") ;
     console.log(step);
     if (step != undefined){
         i = parseInt(step);

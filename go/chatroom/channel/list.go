@@ -2,9 +2,11 @@ package channel
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"errors"
 	"time"
+	"unsafe"
 
 	"gitee.com/qiulaidongfeng/chatroom/go/chatroom/internal/config"
 	"github.com/redis/go-redis/v9"
@@ -17,11 +19,16 @@ var _ Channel = (*list_channel)(nil)
 // TODO:支持返回在线人数
 type list_channel struct {
 	rdb *redis.Client
+	id  *redis.Client
 }
 
 func (c *list_channel) Init() {
 	c.rdb = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 15, Password: config.GetRedisPassword(), TLSConfig: &tls.Config{MinVersion: tls.VersionTLS13}})
 	if err := c.rdb.Ping(context.Background()).Err(); err != nil {
+		panic(err)
+	}
+	c.id = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 14, Password: config.GetRedisPassword(), TLSConfig: &tls.Config{MinVersion: tls.VersionTLS13}})
+	if err := c.id.Ping(context.Background()).Err(); err != nil {
 		panic(err)
 	}
 	if config.Test {
@@ -78,15 +85,15 @@ func (c *list_channel) SendMessage(roomname string, message string) bool {
 	return true
 }
 
-func (c *list_channel) GetInfo(roomname string) (history []string, ttl time.Duration, exist bool) {
+func (c *list_channel) GetInfo(roomname, id string) (history []string, ttl time.Duration, exist bool, online int64) {
 	//TODO:处理下面三条语句出现错误
 	l := c.rdb.LLen(context.Background(), roomname).Val()
 	history = c.rdb.LRange(context.Background(), roomname, 0, l).Val()
 	if len(history) == 0 {
-		return nil, 0, false
+		return nil, 0, false, 0
 	}
 	ttl = c.rdb.TTL(context.Background(), roomname).Val()
-	return history[1:], ttl, true
+	return history[1:], ttl, true, c.getOnline(roomname)
 }
 
 func (c *list_channel) ExitRoom(roomname string) {
@@ -95,6 +102,31 @@ func (c *list_channel) ExitRoom(roomname string) {
 	if config.Test {
 		c.rdb.FlushAll(context.Background())
 	}
+}
+
+func (c *list_channel) SetIdExpire(roomname, id string, expire time.Duration) {
+	//TODO:处理如果在这里出现错误
+	c.id.HExpireAt(context.Background(), roomname, time.Now().Add(expire), id)
+}
+
+func (c *list_channel) EnterRoom(roomname string, expire time.Duration) (id string) {
+	id = genid()
+	//TODO:处理如果在这里出现错误
+	for !c.id.HSetNX(context.Background(), roomname, id, "").Val() {
+		id = genid()
+	}
+	c.id.HExpireAt(context.Background(), roomname, time.Now().Add(expire), id)
+	return id
+}
+
+func (c *list_channel) getOnline(roomname string) (ret int64) {
+	return c.id.HLen(context.Background(), roomname).Val()
+}
+
+func genid() string {
+	var b [32]byte
+	rand.Read(b[:])
+	return unsafe.String(unsafe.SliceData(b[:]), len(b))
 }
 
 // waitMessage 实现接口存在
