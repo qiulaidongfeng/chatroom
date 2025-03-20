@@ -41,7 +41,7 @@ func (c *list_channel) CreateRoom(name string) (ret bool) {
 				return exists
 			}
 			_, err := tx.TxPipelined(context.Background(), func(pipe redis.Pipeliner) error {
-				err := pipe.LPush(context.Background(), name, "").Err()
+				err := pipe.RPush(context.Background(), name, "").Err()
 				if err != nil {
 					return err
 				}
