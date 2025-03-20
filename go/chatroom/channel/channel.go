@@ -1,3 +1,4 @@
+// Package channal 基于redis实现聊天室
 package channel
 
 import (
