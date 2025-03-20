@@ -2,9 +2,11 @@ package channel
 
 import (
 	"context"
+	"crypto/tls"
 	"sync"
 	"time"
 
+	"gitee.com/qiulaidongfeng/chatroom/go/chatroom/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -31,7 +33,7 @@ type pubsub_room struct {
 var seam = make(chan struct{})
 
 func (c *pubsub_channel) Init() {
-	c.rdb = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 15})
+	c.rdb = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 15, Password: config.GetRedisPassword(), TLSConfig: &tls.Config{MinVersion: tls.VersionTLS13}})
 	if err := c.rdb.Ping(context.Background()).Err(); err != nil {
 		panic(err)
 	}
@@ -61,7 +63,7 @@ func (c *pubsub_channel) CreateRoom(name string) bool {
 				c.ExitRoom(name)
 				return
 			}
-			if Test {
+			if config.Test {
 				seam <- struct{}{}
 			}
 			r.lock.Lock()

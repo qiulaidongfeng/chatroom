@@ -2,9 +2,11 @@ package channel
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"time"
 
+	"gitee.com/qiulaidongfeng/chatroom/go/chatroom/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -18,11 +20,11 @@ type list_channel struct {
 }
 
 func (c *list_channel) Init() {
-	c.rdb = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 15})
+	c.rdb = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 15, Password: config.GetRedisPassword(), TLSConfig: &tls.Config{MinVersion: tls.VersionTLS13}})
 	if err := c.rdb.Ping(context.Background()).Err(); err != nil {
 		panic(err)
 	}
-	if Test {
+	if config.Test {
 		if len(c.rdb.Keys(context.Background(), "*").Val()) != 0 {
 			panic("测试应该使用空数据库")
 		}
@@ -90,7 +92,7 @@ func (c *list_channel) GetInfo(roomname string) (history []string, ttl time.Dura
 func (c *list_channel) ExitRoom(roomname string) {
 	//TODO:处理如果在这里出现错误
 	c.rdb.Del(context.Background(), roomname)
-	if Test {
+	if config.Test {
 		c.rdb.FlushAll(context.Background())
 	}
 }

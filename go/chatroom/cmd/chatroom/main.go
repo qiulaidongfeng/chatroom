@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gitee.com/qiulaidongfeng/chatroom/go/chatroom/chatroom"
+	"gitee.com/qiulaidongfeng/chatroom/go/chatroom"
 )
 
 func main() {

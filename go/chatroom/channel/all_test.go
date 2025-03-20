@@ -3,6 +3,8 @@ package channel
 import (
 	"slices"
 	"testing"
+
+	"gitee.com/qiulaidongfeng/chatroom/go/chatroom/internal/config"
 )
 
 func TestAll(t *testing.T) {
@@ -20,7 +22,7 @@ func TestAll(t *testing.T) {
 }
 
 func init() {
-	if !Test {
+	if !config.Test {
 		panic("测试应该设置TEST环境变量为非空")
 	}
 }
