@@ -5,11 +5,14 @@ import (
 	"os"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/go-viper/encoding/ini"
 	"github.com/spf13/viper"
 )
 
 var v *viper.Viper = func() *viper.Viper {
-	v := viper.New()
+	codecRegistry := viper.NewCodecRegistry()
+	codecRegistry.RegisterCodec("ini", ini.Codec{})
+	v := viper.NewWithOptions(viper.WithCodecRegistry(codecRegistry))
 	prefix := ""
 	if Test {
 		prefix = "../"
