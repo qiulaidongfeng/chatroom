@@ -3,10 +3,7 @@ package chatroom
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"log/slog"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -92,19 +89,6 @@ func enterRoom(ctx *gin.Context, name string) bool {
 	ctx.Data(200, "text/html", buf.Bytes())
 	return true
 }
-
-var roomtmpl = func() *template.Template {
-	t := template.New("room")
-	file, err := os.ReadFile(filepath.Join(tmpl, "room.temp"))
-	if err != nil {
-		panic(err)
-	}
-	t, err = t.Parse(string(file))
-	if err != nil {
-		panic(err)
-	}
-	return t
-}()
 
 func redirect(ctx *gin.Context, name string) {
 	ret := `
