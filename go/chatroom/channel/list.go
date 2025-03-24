@@ -15,8 +15,6 @@ import (
 var _ Channel = (*list_channel)(nil)
 
 // list_channel 管理基于redis列表实现的聊天室
-// TODO:支持多个用户进入并退出聊天室
-// TODO:支持返回在线人数
 type list_channel struct {
 	rdb *redis.Client
 	id  *redis.Client
@@ -96,9 +94,9 @@ func (c *list_channel) GetInfo(roomname, id string) (history []string, ttl time.
 	return history[1:], ttl, true, c.getOnline(roomname)
 }
 
-func (c *list_channel) ExitRoom(roomname string) {
+func (c *list_channel) ExitRoom(roomname, id string) {
 	//TODO:处理如果在这里出现错误
-	c.rdb.Del(context.Background(), roomname)
+	c.id.HDel(context.Background(), roomname, id)
 	if config.Test {
 		c.rdb.FlushAll(context.Background())
 	}

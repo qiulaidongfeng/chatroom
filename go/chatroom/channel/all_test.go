@@ -20,7 +20,7 @@ func TestAll(t *testing.T) {
 	if online != 2 {
 		t.Fatalf("got %d, want 2", online)
 	}
-	C.ExitRoom("test")
+	C.ExitRoom("test", id)
 	want := []string{"k", "k"}
 	if !slices.Equal(got, want) {
 		t.Fatalf("got %v, want %v", got, want)

@@ -56,6 +56,12 @@ func Handle(s *gin.Engine) {
 		}
 		redirect(ctx, name)
 	})
+	s.GET("/exitroom", func(ctx *gin.Context) {
+		name := ctx.Query("roomname")
+		id, _ := ctx.Cookie(name + "_id")
+		channel.C.ExitRoom(name, id)
+		redirect(ctx, "/")
+	})
 }
 
 func enterRoom(ctx *gin.Context, name string) bool {
@@ -106,6 +112,10 @@ func redirect(ctx *gin.Context, name string) {
 		</script>
 	</html>
 	`
-	ret = fmt.Sprintf(ret, strings.Join([]string{"https://", ctx.Request.Host, "/enterroom?roomname=", name}, ""))
+	if name == "/" {
+		ret = fmt.Sprintf(ret, "https://"+ctx.Request.Host)
+	} else {
+		ret = fmt.Sprintf(ret, strings.Join([]string{"https://", ctx.Request.Host, "/enterroom?roomname=", name}, ""))
+	}
 	ctx.Data(200, "text/html", unsafe.Slice(unsafe.StringData(ret), len(ret)))
 }

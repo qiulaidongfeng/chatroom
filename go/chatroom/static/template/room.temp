@@ -78,7 +78,7 @@
         <div class="info-row">
             <p>距离聊天室自动删除还有：{{.removetime}}</p>
             <p>在线id数：{{.online}}</p>
-            <button onclick="window.location.href='/'">返回首页</button>
+            <button onclick="location.assign('/exitroom?roomname={{.roomname}}')">退出</button>
             <button onclick="location.reload()">立即刷新</button>
         </div>
         <input type="number" step="1" min="0" id="reloadStep">

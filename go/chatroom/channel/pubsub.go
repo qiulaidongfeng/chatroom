@@ -61,7 +61,7 @@ func (c *pubsub_channel) CreateRoom(name string) bool {
 			select {
 			case m = <-ch:
 			case <-r.t.C:
-				c.ExitRoom(name)
+				c.ExitRoom(name, "")
 				return
 			}
 			if config.Test {
@@ -111,7 +111,7 @@ func (c *pubsub_channel) waitMessage() {
 	<-seam
 }
 
-func (c *pubsub_channel) ExitRoom(roomname string) {
+func (c *pubsub_channel) ExitRoom(roomname, id string) {
 	v, ok := c.all.LoadAndDelete(roomname)
 	if !ok {
 		return

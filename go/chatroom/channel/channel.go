@@ -16,7 +16,7 @@ type Channel interface {
 	// SetIdExpire 设置id的过期时间为当前时间经过一定时期
 	SetIdExpire(roomname, id string, expire time.Duration)
 	// ExitRoom 退出聊天室
-	ExitRoom(roomname string)
+	ExitRoom(roomname, id string)
 	// GetInfo 获取聊天室的信息
 	GetInfo(roomname string, id string) (history []string, ttl time.Duration, exist bool, online int64)
 	// Init 进行连接数据库之类的初始化
