@@ -45,17 +45,6 @@ func Handle(s *gin.Engine) {
 		}
 		ctx.File(enterroom)
 	})
-	s.POST("/enterroom", func(ctx *gin.Context) {
-		name := ctx.PostForm("roomName")
-		if name == "" {
-			ctx.String(400, "聊天室名不能为空")
-			return
-		}
-		if !enterRoom(ctx, name) {
-			ctx.String(400, "聊天室 %s 不存在", name)
-			return
-		}
-	})
 	s.POST("/sendMessage", func(ctx *gin.Context) {
 		name := ctx.Query("roomname")
 		msg := ctx.PostForm("message")
