@@ -103,8 +103,13 @@ func (c *list_channel) ExitRoom(roomname, id string) {
 }
 
 func (c *list_channel) SetIdExpire(roomname, id string, expire time.Duration) {
-	//TODO:处理如果在这里出现错误
-	c.id.HExpireAt(context.Background(), roomname, time.Now().Add(expire), id)
+	s, err := c.id.HExpireAt(context.Background(), roomname, time.Now().Add(expire), id).Result()
+	if err != nil {
+		panic(err)
+	}
+	if s[0] != 1 {
+		panic(s[0])
+	}
 }
 
 func (c *list_channel) EnterRoom(roomname string, expire time.Duration) (id string) {
@@ -113,7 +118,7 @@ func (c *list_channel) EnterRoom(roomname string, expire time.Duration) (id stri
 	for !c.id.HSetNX(context.Background(), roomname, id, "").Val() {
 		id = genid()
 	}
-	c.id.HExpireAt(context.Background(), roomname, time.Now().Add(expire), id)
+	c.SetIdExpire(roomname, id, expire)
 	return id
 }
 
