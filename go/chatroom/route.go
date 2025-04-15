@@ -60,6 +60,8 @@ func Handle(s *gin.Engine) {
 		name := ctx.Query("roomname")
 		id, _ := ctx.Cookie(name + "_id")
 		channel.C.ExitRoom(name, id)
+		ctx.SetCookie(name+"_id", "", -1, "", "", true, true)
+		ctx.SetCookie(name+"_step", "", -1, "", "", true, true)
 		redirect(ctx, "/")
 	})
 }
