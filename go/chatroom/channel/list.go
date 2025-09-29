@@ -3,7 +3,6 @@ package channel
 import (
 	"context"
 	"crypto/rand"
-	"crypto/tls"
 	"errors"
 	"time"
 	"unsafe"
@@ -21,11 +20,11 @@ type list_channel struct {
 }
 
 func (c *list_channel) Init() {
-	c.rdb = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 15, Password: config.GetRedisPassword(), TLSConfig: &tls.Config{MinVersion: tls.VersionTLS13}})
+	c.rdb = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 15, Password: config.GetRedisPassword()})
 	if err := c.rdb.Ping(context.Background()).Err(); err != nil {
 		panic(err)
 	}
-	c.id = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 14, Password: config.GetRedisPassword(), TLSConfig: &tls.Config{MinVersion: tls.VersionTLS13}})
+	c.id = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DB: 14, Password: config.GetRedisPassword()})
 	if err := c.id.Ping(context.Background()).Err(); err != nil {
 		panic(err)
 	}
