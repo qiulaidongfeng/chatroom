@@ -106,6 +106,11 @@ func (c *list_channel) SetIdExpire(roomname, id string, expire time.Duration) {
 	if err != nil {
 		panic(err)
 	}
+	if s[0] == -2 { //处理网页带cookie id来的太晚
+		c.id.HSetNX(context.Background(), roomname, id, "")
+		c.SetIdExpire(roomname, id, expire)
+		return
+	}
 	if s[0] != 1 {
 		panic(s[0])
 	}
